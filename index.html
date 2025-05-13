@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Добавлены обязательные мета-теги -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLACKTHORN INTRANET</title>
+    <style>
+        /* Ваши стили остаются без изменений */
+        body { background-color: #000; color: #0f0; font-family: 'Courier New', monospace; }
+        /* ... остальной CSS ... */
+    </style>
+</head>
+<body>
+    <!-- Звуки с локальными путями -->
+    <audio id="bg-sound" loop><source src="sounds/bg-noise.mp3" type="audio/mpeg"></audio>
+    <audio id="glitch-sound"><source src="sounds/glitch.mp3" type="audio/mpeg"></audio>
+    <audio id="error-sound"><source src="sounds/error.mp3" type="audio/mpeg"></audio>
+
+    <div class="terminal">
+        <!-- Ваш интерфейс -->
+        <div class="status-bar">> INMATE_ID: CELL-12</div>
+        <!-- ... остальной HTML ... -->
+    </div>
+
+    <script>
+        // Инициализация после загрузки страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ваш JavaScript код
+            console.log("System initialized");
+        });
+    </script>
+</body>
+</html>
