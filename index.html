@@ -1,33 +1,406 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <!-- Добавлены обязательные мета-теги -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BLACKTHORN INTRANET</title>
+    <title>BLOCKGAUZ INTRANET v3.1.4</title>
     <style>
-        /* Ваши стили остаются без изменений */
-        body { background-color: #000; color: #0f0; font-family: 'Courier New', monospace; }
-        /* ... остальной CSS ... */
+        body {
+            background-color: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            cursor: default;
+        }
+        
+        .glitch-effect {
+            text-shadow: 0 0 5px #0f0;
+            animation: glitch 1s infinite;
+        }
+        
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+            60% { transform: translate(-2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+        
+        .terminal {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+            border: 1px solid #0f0;
+            padding: 10px;
+            background-color: rgba(0, 20, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent,
+                transparent 1px,
+                rgba(0, 255, 0, 0.05) 2px
+            );
+            pointer-events: none;
+        }
+        
+        .error {
+            color: #f00;
+            animation: blink 0.5s infinite;
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        .menu-item {
+            margin: 5px 0;
+            cursor: pointer;
+            padding: 3px;
+        }
+        
+        .menu-item:hover {
+            background-color: rgba(0, 255, 0, 0.1);
+        }
+        
+        .status-bar {
+            border-bottom: 1px solid #0f0;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .chat-message {
+            margin: 5px 0;
+            padding: 3px;
+            border-bottom: 1px dotted #0f0;
+        }
+        
+        #chat-input {
+            background: black;
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 5px;
+            width: 70%;
+            font-family: 'Courier New', monospace;
+        }
+        
+        #audio-toggle {
+            background: black;
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 5px 10px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+        }
     </style>
 </head>
 <body>
-    <!-- Звуки с локальными путями -->
-    <audio id="bg-sound" loop><source src="sounds/bg-noise.mp3" type="audio/mpeg"></audio>
-    <audio id="glitch-sound"><source src="sounds/glitch.mp3" type="audio/mpeg"></audio>
-    <audio id="error-sound"><source src="sounds/error.mp3" type="audio/mpeg"></audio>
-
+    <!-- Локальные аудиофайлы -->
+    <audio id="bg-sound" loop>
+        <source src="sounds/bg-noise.mp3" type="audio/mpeg">
+        Ваш браузер не поддерживает аудио.
+    </audio>
+    <audio id="glitch-sound">
+        <source src="sounds/glitch.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="error-sound">
+        <source src="sounds/error.mp3" type="audio/mpeg">
+    </audio>
+    
     <div class="terminal">
-        <!-- Ваш интерфейс -->
-        <div class="status-bar">> INMATE_ID: CELL-12</div>
-        <!-- ... остальной HTML ... -->
+        <div class="scanlines"></div>
+        
+        <div class="status-bar glitch-effect">
+            > INMATE_ID: <span id="inmate-id">CELL-<span id="cell-num">12</span></span> | 
+            CREDITS: <span id="credits">120</span> | 
+            STATUS: <span class="error">RESTRICTED</span>
+        </div>
+        
+        <div id="main-menu">
+            <h2 class="glitch-effect">> BLACKTHORN INTRANET v3.1.4</h2>
+            <p>Last login: <span id="last-login">ERROR: DATE CORRUPTED</span></p>
+            
+            <div class="menu-item" onclick="showSection('schedule')">[1] SCHEDULE</div>
+            <div class="menu-item" onclick="showSection('shop')">[2] CREDIT SHOP</div>
+            <div class="menu-item" onclick="showSection('violations')">[3] VIOLATIONS</div>
+            <div class="menu-item" onclick="showSection('rules')">[4] RULES</div>
+            <div class="menu-item" onclick="showSection('chat')">[5] INMATE CHAT (UNOFFICIAL)</div>
+            <div class="menu-item error" onclick="fakeCrash()">[6] REQUEST MEDICAL (UNAVAILABLE)</div>
+        </div>
+        
+        <div id="content-area" style="margin-top: 20px;"></div>
+        
+        <button id="audio-toggle" onclick="toggleAudio()">ENABLE AUDIO</button>
     </div>
 
     <script>
-        // Инициализация после загрузки страницы
-        document.addEventListener('DOMContentLoaded', function() {
-            // Ваш JavaScript код
-            console.log("System initialized");
+        // ========== Инициализация аудио ==========
+        const bgSound = document.getElementById('bg-sound');
+        const glitchSound = document.getElementById('glitch-sound');
+        const errorSound = document.getElementById('error-sound');
+        let audioEnabled = false;
+        
+        // Установка громкости
+        bgSound.volume = 0.3;
+        glitchSound.volume = 0.5;
+        errorSound.volume = 0.7;
+        
+        // ========== Управление звуком ==========
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const button = document.getElementById('audio-toggle');
+            
+            if (audioEnabled) {
+                bgSound.play().catch(e => {
+                    console.error("Audio error:", e);
+                    button.textContent = "AUDIO BLOCKED (CLICK AGAIN)";
+                    audioEnabled = false;
+                });
+                button.textContent = "DISABLE AUDIO";
+            } else {
+                bgSound.pause();
+                button.textContent = "ENABLE AUDIO";
+            }
+        }
+        
+        // ========== Глобальные переменные ==========
+        let credits = 120;
+        const inmateChat = [
+            {sender: "CELL-8", message: "Кто на вылазку в D-9 завтра?"},
+            {sender: "CELL-15", message: "Не ходите. Там что-то новое появилось..."},
+            {sender: "CELL-3", message: "Меняю патроны на антибиотики"},
+            {sender: "ADMIN", message: "WARNING: UNAUTHORIZED COMMUNICATION DETECTED"}
+        ];
+        
+        // ========== Функции помех ==========
+        function simulateGlitch() {
+            // Случайное изменение цвета текста
+            if (Math.random() > 0.7) {
+                document.body.style.color = (Math.random() > 0.5) ? "#f00" : "#0f0";
+            }
+            
+            // Случайные смещения текста
+            if (Math.random() > 0.9) {
+                const glitchText = document.querySelectorAll('.glitch-effect');
+                glitchText.forEach(el => {
+                    el.style.transform = `translate(${Math.random() * 4 - 2}px, ${Math.random() * 4 - 2}px)`;
+                });
+            }
+            
+            // Случайные звуковые глюки
+            if (audioEnabled && Math.random() > 0.95) {
+                glitchSound.currentTime = 0;
+                glitchSound.play().catch(e => console.error("Glitch sound error:", e));
+                bgSound.playbackRate = Math.random() * 2 + 0.5;
+            }
+            
+            setTimeout(simulateGlitch, 1000);
+        }
+        
+        // ========== Имитация сбоя системы ==========
+        function fakeCrash() {
+            if (audioEnabled) {
+                errorSound.currentTime = 0;
+                errorSound.play().catch(e => console.error("Error sound error:", e));
+            }
+            
+            const terminal = document.querySelector('.terminal');
+            const oldContent = terminal.innerHTML;
+            
+            terminal.innerHTML = `
+                <div style="color: #f00;">
+                    > SYSTEM ERROR 0x1F3A7<br>
+                    > MEDICAL REQUEST DENIED<br>
+                    > REASON: INSUFFICIENT CREDITS<br>
+                    > CONTACT ADMINISTRATOR<br><br>
+                    <span class="blink">_</span>
+                </div>
+            `;
+            
+            // Добавляем эффект перезагрузки
+            setTimeout(() => {
+                terminal.innerHTML += "> ATTEMPTING SYSTEM RECOVERY...";
+            }, 1500);
+            
+            setTimeout(() => {
+                terminal.innerHTML += "<br>> LOADING BACKUP...";
+            }, 3000);
+            
+            setTimeout(() => {
+                terminal.innerHTML = oldContent;
+                initTerminal();
+            }, 5000);
+        }
+        
+        // ========== Отображение разделов ==========
+        function showSection(section) {
+            const contentArea = document.getElementById('content-area');
+            if (!contentArea) return;
+            
+            let content = "";
+            
+            switch(section) {
+                case 'schedule':
+                    content = `
+                        > NEXT EXPEDITION:<br>
+                        - DATE: 12/04/2547<br>
+                        - SECTOR: D-9<br>
+                        - OBJECTIVE: RETRIEVE SAMPLE #X-12<br>
+                        - REWARD: 50 CREDITS<br>
+                        <span class="error">WARNING: 78% FATALITY RATE</span>
+                    `;
+                    break;
+                    
+                case 'shop':
+                    content = `
+                        > CREDIT SHOP:<br>
+                        [1] GAS MASK FILTER - 20 CREDITS<br>
+                        [2] PAIN RELIEF - 15 CREDITS<br>
+                        [3] EXTRA RATIONS - 10 CREDITS<br>
+                        <span class="${credits < 10 ? 'error' : ''}">YOUR CREDITS: ${credits}</span>
+                    `;
+                    break;
+                    
+                case 'violations':
+                    content = `
+                        > VIOLATIONS:<br>
+                        - 12/03/2547: ATTEMPTED BRACELET TAMPERING (-50 CR)<br>
+                        - 11/29/2547: REFUSED CLEANING DUTY (-30 CR)<br>
+                        <span class="error">NEXT VIOLATION: ELECTROSHOCK</span>
+                    `;
+                    break;
+                    
+                case 'rules':
+                    content = `
+                        > RULES:<br>
+                        1. ESCAPE = TERMINATION<br>
+                        2. DISOBEDIENCE = CREDIT DEDUCTION<br>
+                        3. EXPEDITION FAILURE = DEMOTION TO CLEANING CREW<br>
+                        <span class="glitch-effect">BLACKTHORN IS WATCHING</span>
+                    `;
+                    break;
+                    
+                case 'chat':
+                    content = `
+                        > INMATE CHAT (LAST 4 MESSAGES):<br>
+                        <div id="chat-messages">
+                            ${inmateChat.map(msg => 
+                                `<div class="chat-message">
+                                    <strong>${msg.sender}:</strong> ${msg.message}
+                                </div>`
+                            ).join('')}
+                        </div>
+                        <br>
+                        > NEW MESSAGE:<br>
+                        <input type="text" id="chat-input" placeholder="Message (risky to send)">
+                        <button onclick="sendMessage()" style="background: black; color: #0f0; border: 1px solid #0f0;">SEND</button>
+                        <span class="error" id="chat-warning"></span>
+                    `;
+                    break;
+            }
+            
+            contentArea.innerHTML = content;
+        }
+        
+        // ========== Функции чата ==========
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const warning = document.getElementById('chat-warning');
+            
+            if (!input || !warning) return;
+            if (input.value.trim() === '') return;
+            
+            // 30% chance of being detected
+            if (Math.random() < 0.3) {
+                warning.textContent = "! ADMIN ALERT: UNAUTHORIZED COMMUNICATION !";
+                inmateChat.push({
+                    sender: "ADMIN", 
+                    message: "CELL-" + document.getElementById('cell-num').textContent + " VIOLATION RECORDED"
+                });
+                
+                // Deduct credits for violation
+                credits = Math.max(0, credits - 15);
+                const creditsElement = document.getElementById('credits');
+                if (creditsElement) creditsElement.textContent = credits;
+                
+                // Simulate admin message delay
+                setTimeout(() => {
+                    const chatMessages = document.getElementById('chat-messages');
+                    if (chatMessages) {
+                        chatMessages.innerHTML += `
+                            <div class="chat-message error">
+                                <strong>ADMIN:</strong> WARNING: NEXT VIOLATION WILL TRIGGER BRACELET SHOCK
+                            </div>
+                        `;
+                    }
+                }, 2000);
+            } else {
+                // Add normal message
+                inmateChat.push({
+                    sender: "CELL-" + document.getElementById('cell-num').textContent,
+                    message: input.value
+                });
+            }
+            
+            // Update chat
+            showSection('chat');
+            input.value = '';
+            
+            // Random cell number change (security measure)
+            if (Math.random() > 0.7) {
+                const cellNum = document.getElementById('cell-num');
+                if (cellNum) {
+                    cellNum.textContent = Math.floor(Math.random() * 20) + 1;
+                }
+            }
+        }
+        
+        // ========== Инициализация терминала ==========
+        function initTerminal() {
+            // Random last login time
+            const lastLogin = new Date();
+            lastLogin.setDate(lastLogin.getDate() - Math.floor(Math.random() * 5));
+            const lastLoginElement = document.getElementById('last-login');
+            if (lastLoginElement) {
+                lastLoginElement.textContent = lastLogin.toLocaleString() + " (SYNC ERROR)";
+            }
+            
+            // Random cell number
+            const cellNum = document.getElementById('cell-num');
+            if (cellNum) {
+                cellNum.textContent = Math.floor(Math.random() * 20) + 1;
+            }
+            
+            // Reattach event listeners
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                const section = item.getAttribute('onclick')?.replace("showSection('", "").replace("')", "");
+                if (section) {
+                    item.onclick = () => showSection(section);
+                }
+            });
+            
+            document.getElementById('audio-toggle').onclick = toggleAudio;
+        }
+        
+        // ========== Запуск системы ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            initTerminal();
+            simulateGlitch();
         });
     </script>
 </body>
