@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BLOCKGAUZ INTRANET v3.1.4</title>
     <style>
-        /* Ваши существующие стили остаются без изменений */
+        /* Все ваши существующие стили остаются без изменений */
         body {
             background-color: #000;
             color: #0f0;
@@ -148,17 +148,17 @@
                 <h2 class="glitch-effect">> BLACKTHORN INTRANET v3.1.4</h2>
                 <p>Last login: <span id="last-login">ERROR: DATE CORRUPTED</span></p>
                 
-                <div class="menu-item" onclick="showSection('schedule')">[1] SCHEDULE</div>
-                <div class="menu-item" onclick="showSection('shop')">[2] CREDIT SHOP</div>
-                <div class="menu-item" onclick="showSection('violations')">[3] VIOLATIONS</div>
-                <div class="menu-item" onclick="showSection('rules')">[4] RULES</div>
-                <div class="menu-item" onclick="showSection('chat')">[5] INMATE CHAT (UNOFFICIAL)</div>
-                <div class="menu-item error" onclick="fakeCrash()">[6] REQUEST MEDICAL (UNAVAILABLE)</div>
+                <div class="menu-item" data-section="schedule">[1] SCHEDULE</div>
+                <div class="menu-item" data-section="shop">[2] CREDIT SHOP</div>
+                <div class="menu-item" data-section="violations">[3] VIOLATIONS</div>
+                <div class="menu-item" data-section="rules">[4] RULES</div>
+                <div class="menu-item" data-section="chat">[5] INMATE CHAT (UNOFFICIAL)</div>
+                <div class="menu-item error" id="medical-request">[6] REQUEST MEDICAL (UNAVAILABLE)</div>
             </div>
             
             <div id="content-area" style="margin-top: 20px;"></div>
             
-            <button id="audio-toggle" onclick="toggleAudio()">ENABLE AUDIO</button>
+            <button id="audio-toggle">ENABLE AUDIO</button>
         </div>
         
         <!-- Экран сбоя (изначально скрыт) -->
@@ -186,6 +186,15 @@
         errorSound.volume = 0.7;
         adminAlertSound.volume = 0.6;
         
+        // ========== Глобальные переменные ==========
+        let credits = 120;
+        const inmateChat = [
+            {sender: "CELL-8", message: "Кто на вылазку в D-9 завтра?"},
+            {sender: "CELL-15", message: "Не ходите. Там что-то новое появилось..."},
+            {sender: "CELL-3", message: "Меняю патроны на антибиотики"},
+            {sender: "ADMIN", message: "WARNING: UNAUTHORIZED COMMUNICATION DETECTED"}
+        ];
+        
         // ========== Управление звуком ==========
         function toggleAudio() {
             audioEnabled = !audioEnabled;
@@ -203,15 +212,6 @@
                 button.textContent = "ENABLE AUDIO";
             }
         }
-        
-        // ========== Глобальные переменные ==========
-        let credits = 120;
-        const inmateChat = [
-            {sender: "CELL-8", message: "Кто на вылазку в D-9 завтра?"},
-            {sender: "CELL-15", message: "Не ходите. Там что-то новое появилось..."},
-            {sender: "CELL-3", message: "Меняю патроны на антибиотики"},
-            {sender: "ADMIN", message: "WARNING: UNAUTHORIZED COMMUNICATION DETECTED"}
-        ];
         
         // ========== Функции помех ==========
         function simulateGlitch() {
@@ -249,14 +249,7 @@
             document.getElementById('main-interface').style.display = 'none';
             const crashScreen = document.getElementById('crash-screen');
             crashScreen.style.display = 'block';
-            crashScreen.innerHTML = `
-                > SYSTEM ERROR 0x1F3A7<br>
-                > MEDICAL REQUEST DENIED<br>
-                > REASON: INSUFFICIENT CREDITS<br>
-                > CONTACT ADMINISTRATOR<br><br>
-                <span class="blink">_</span>
-                <div id="crash-progress"></div>
-            `;
+            document.getElementById('crash-progress').innerHTML = '';
             
             // Добавляем эффект перезагрузки
             setTimeout(() => {
@@ -271,11 +264,10 @@
                 // Восстанавливаем интерфейс
                 crashScreen.style.display = 'none';
                 document.getElementById('main-interface').style.display = 'block';
-                initTerminal(); // Переинициализируем обработчики событий
             }, 5000);
         }
         
-        // ========== Остальные функции остаются без изменений ==========
+        // ========== Отображение разделов ==========
         function showSection(section) {
             const contentArea = document.getElementById('content-area');
             if (!contentArea) return;
@@ -336,15 +328,21 @@
                         <br>
                         > NEW MESSAGE:<br>
                         <input type="text" id="chat-input" placeholder="Message (risky to send)">
-                        <button onclick="sendMessage()" style="background: black; color: #0f0; border: 1px solid #0f0;">SEND</button>
+                        <button id="send-message-btn" style="background: black; color: #0f0; border: 1px solid #0f0;">SEND</button>
                         <span class="error" id="chat-warning"></span>
                     `;
                     break;
             }
             
             contentArea.innerHTML = content;
+            
+            // Если это чат, инициализируем кнопку отправки
+            if (section === 'chat') {
+                document.getElementById('send-message-btn').addEventListener('click', sendMessage);
+            }
         }
         
+        // ========== Функции чата ==========
         function sendMessage() {
             const input = document.getElementById('chat-input');
             const warning = document.getElementById('chat-warning');
@@ -418,16 +416,16 @@
                 cellNum.textContent = Math.floor(Math.random() * 20) + 1;
             }
             
-            // Reattach event listeners
-            const menuItems = document.querySelectorAll('.menu-item');
-            menuItems.forEach(item => {
-                const section = item.getAttribute('onclick')?.replace("showSection('", "").replace("')", "");
+            // Назначаем обработчики событий
+            document.querySelectorAll('.menu-item').forEach(item => {
+                const section = item.getAttribute('data-section');
                 if (section) {
-                    item.onclick = () => showSection(section);
+                    item.addEventListener('click', () => showSection(section));
                 }
             });
             
-            document.getElementById('audio-toggle').onclick = toggleAudio;
+            document.getElementById('medical-request').addEventListener('click', fakeCrash);
+            document.getElementById('audio-toggle').addEventListener('click', toggleAudio);
         }
         
         // ========== Запуск системы ==========
