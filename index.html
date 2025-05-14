@@ -3,23 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BLOCKGAUZ INTRANET v3.2.0</title>
+    <title>BLOCKGAUZ INTRANET v3.2.1</title>
     <style>
-        body {
-            background-color: #000;
-            color: #0f0;
-            font-family: 'Courier New', monospace;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            cursor: default;
-        }
-        
-        .glitch-effect {
-            text-shadow: 0 0 5px #0f0;
-            animation: glitch 1s infinite;
-        }
-        
+        /* Все стили остаются без изменений */
+        body { background-color: #000; color: #0f0; font-family: 'Courier New', monospace; margin: 0; padding: 0; overflow-x: hidden; cursor: default; }
+        .glitch-effect { text-shadow: 0 0 5px #0f0; animation: glitch 1s infinite; }
         @keyframes glitch {
             0% { transform: translate(0); }
             20% { transform: translate(-2px, 2px); }
@@ -28,138 +16,32 @@
             80% { transform: translate(2px, -2px); }
             100% { transform: translate(0); }
         }
-        
-        .terminal {
-            width: 90%;
-            max-width: 800px;
-            margin: 20px auto;
-            border: 1px solid #0f0;
-            padding: 10px;
-            background-color: rgba(0, 20, 0, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .scanlines {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(
-                to bottom,
-                transparent,
-                transparent 1px,
-                rgba(0, 255, 0, 0.05) 2px
-            );
-            pointer-events: none;
-        }
-        
-        .error {
-            color: #f00;
-            animation: blink 0.5s infinite;
-        }
-        
-        @keyframes blink {
-            0% { opacity: 1; }
-            50% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-        
-        .menu-item {
-            margin: 5px 0;
-            cursor: pointer;
-            padding: 3px;
-        }
-        
-        .menu-item:hover {
-            background-color: rgba(0, 255, 0, 0.1);
-        }
-        
-        .status-bar {
-            border-bottom: 1px solid #0f0;
-            padding-bottom: 5px;
-            margin-bottom: 10px;
-        }
-        
-        .chat-message {
-            margin: 5px 0;
-            padding: 3px;
-            border-bottom: 1px dotted #0f0;
-        }
-        
-        #chat-input {
-            background: black;
-            color: #0f0;
-            border: 1px solid #0f0;
-            padding: 5px;
-            width: 70%;
-            font-family: 'Courier New', monospace;
-        }
-        
-        #audio-toggle {
-            background: black;
-            color: #0f0;
-            border: 1px solid #0f0;
-            padding: 5px 10px;
-            margin-top: 10px;
-            cursor: pointer;
-            font-family: 'Courier New', monospace;
-        }
-        
-        .blink {
-            animation: blink 0.5s infinite;
-        }
-        
-        #crash-screen {
-            display: none;
-            color: #f00;
-        }
-        
-        .shop-item {
-            margin: 5px 0;
-            padding: 5px;
-            border: 1px dashed #0f0;
-            cursor: pointer;
-        }
-        
-        .shop-item:hover {
-            background-color: rgba(0, 255, 0, 0.1);
-        }
-        
-        #violations-log {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #f00;
-            padding: 5px;
-            margin-top: 10px;
-        }
-        
-        .violation-entry {
-            color: #f00;
-            margin: 3px 0;
-            padding: 2px;
-            border-bottom: 1px solid #f00;
-        }
+        .terminal { width: 90%; max-width: 800px; margin: 20px auto; border: 1px solid #0f0; padding: 10px; background-color: rgba(0, 20, 0, 0.2); position: relative; overflow: hidden; }
+        .scanlines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(to bottom, transparent, transparent 1px, rgba(0, 255, 0, 0.05) 2px); pointer-events: none; }
+        .error { color: #f00; animation: blink 0.5s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+        .menu-item { margin: 5px 0; cursor: pointer; padding: 3px; }
+        .menu-item:hover { background-color: rgba(0, 255, 0, 0.1); }
+        .status-bar { border-bottom: 1px solid #0f0; padding-bottom: 5px; margin-bottom: 10px; }
+        .chat-message { margin: 5px 0; padding: 3px; border-bottom: 1px dotted #0f0; }
+        #chat-input { background: black; color: #0f0; border: 1px solid #0f0; padding: 5px; width: 70%; font-family: 'Courier New', monospace; }
+        #audio-toggle { background: black; color: #0f0; border: 1px solid #0f0; padding: 5px 10px; margin-top: 10px; cursor: pointer; font-family: 'Courier New', monospace; }
+        .blink { animation: blink 0.5s infinite; }
+        #crash-screen { display: none; color: #f00; }
+        .shop-item { margin: 5px 0; padding: 5px; border: 1px dashed #0f0; cursor: pointer; }
+        .shop-item:hover { background-color: rgba(0, 255, 0, 0.1); }
+        #violations-log { max-height: 200px; overflow-y: auto; border: 1px solid #f00; padding: 5px; margin-top: 10px; }
+        .violation-entry { color: #f00; margin: 3px 0; padding: 2px; border-bottom: 1px solid #f00; }
+        #inventory-list { margin-top: 10px; border-top: 1px dashed #0f0; padding-top: 5px; }
     </style>
 </head>
 <body>
-    <!-- Локальные аудиофайлы -->
-    <audio id="bg-sound" loop>
-        <source src="sounds/bg-noise.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="glitch-sound">
-        <source src="sounds/glitch.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="error-sound">
-        <source src="sounds/error.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="admin-alert">
-        <source src="sounds/admin-alert.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="purchase-sound">
-        <source src="sounds/purchase.mp3" type="audio/mpeg">
-    </audio>
+    <!-- Аудиофайлы -->
+    <audio id="bg-sound" loop><source src="sounds/bg-noise.mp3" type="audio/mpeg"></audio>
+    <audio id="glitch-sound"><source src="sounds/glitch.mp3" type="audio/mpeg"></audio>
+    <audio id="error-sound"><source src="sounds/error.mp3" type="audio/mpeg"></audio>
+    <audio id="admin-alert"><source src="sounds/admin-alert.mp3" type="audio/mpeg"></audio>
+    <audio id="purchase-sound"><source src="sounds/purchase.mp3" type="audio/mpeg"></audio>
     
     <div class="terminal">
         <div class="scanlines"></div>
@@ -173,7 +55,7 @@
             </div>
             
             <div id="main-menu">
-                <h2 class="glitch-effect">> BLACKTHORN INTRANET v3.2.0</h2>
+                <h2 class="glitch-effect">> BLACKTHORN INTRANET v3.2.1</h2>
                 <p>Last login: <span id="last-login">ERROR: DATE CORRUPTED</span></p>
                 
                 <div class="menu-item" data-section="schedule">[1] SCHEDULE</div>
@@ -189,7 +71,7 @@
             <button id="audio-toggle">ENABLE AUDIO</button>
         </div>
         
-        <!-- Экран сбоя (изначально скрыт) -->
+        <!-- Экран сбоя -->
         <div id="crash-screen">
             > SYSTEM ERROR 0x1F3A7<br>
             > MEDICAL REQUEST DENIED<br>
@@ -201,22 +83,20 @@
     </div>
 
     <script>
-        // ========== Инициализация аудио ==========
-        const bgSound = document.getElementById('bg-sound');
-        const glitchSound = document.getElementById('glitch-sound');
-        const errorSound = document.getElementById('error-sound');
-        const adminAlertSound = document.getElementById('admin-alert');
-        const purchaseSound = document.getElementById('purchase-sound');
+        // ===== Инициализация =====
+        const audioElements = {
+            bg: document.getElementById('bg-sound'),
+            glitch: document.getElementById('glitch-sound'),
+            error: document.getElementById('error-sound'),
+            admin: document.getElementById('admin-alert'),
+            purchase: document.getElementById('purchase-sound')
+        };
+        
+        // Настройки громкости
+        Object.values(audioElements).forEach(audio => audio.volume = 0.5);
+        audioElements.bg.volume = 0.3;
+        
         let audioEnabled = false;
-        
-        // Установка громкости
-        bgSound.volume = 0.3;
-        glitchSound.volume = 0.5;
-        errorSound.volume = 0.7;
-        adminAlertSound.volume = 0.6;
-        purchaseSound.volume = 0.8;
-        
-        // ========== Глобальные переменные ==========
         let credits = 120;
         const inmateChat = [
             {sender: "CELL-8", message: "Кто на вылазку в D-9 завтра?"},
@@ -225,10 +105,9 @@
             {sender: "ADMIN", message: "WARNING: UNAUTHORIZED COMMUNICATION DETECTED"}
         ];
         
-        // Лог нарушений
         const violationsLog = [];
+        const inventory = [];
         
-        // Товары в магазине
         const shopItems = [
             { id: 1, name: "GAS MASK FILTER", price: 20, description: "Protects against spores (3 uses)" },
             { id: 2, name: "PAIN RELIEF", price: 15, description: "Reduces infection symptoms" },
@@ -236,67 +115,57 @@
             { id: 4, name: "BRACELET OVERRIDE", price: 50, description: "Disables shock for 24h" },
             { id: 5, name: "MAP SECTOR D-9", price: 30, description: "Detailed expedition map" }
         ];
-        
-        // Инвентарь
-        let inventory = [];
-        
-        // ========== Управление звуком ==========
+
+        // ===== Основные функции =====
         function toggleAudio() {
             audioEnabled = !audioEnabled;
             const button = document.getElementById('audio-toggle');
             
             if (audioEnabled) {
-                bgSound.play().catch(e => {
+                audioElements.bg.play().catch(e => {
                     console.error("Audio error:", e);
                     button.textContent = "AUDIO BLOCKED (CLICK AGAIN)";
                     audioEnabled = false;
                 });
                 button.textContent = "DISABLE AUDIO";
             } else {
-                bgSound.pause();
+                audioElements.bg.pause();
                 button.textContent = "ENABLE AUDIO";
             }
         }
         
-        // ========== Функции помех ==========
         function simulateGlitch() {
-            // Случайное изменение цвета текста
             if (Math.random() > 0.7) {
                 document.body.style.color = (Math.random() > 0.5) ? "#f00" : "#0f0";
             }
             
-            // Случайные смещения текста
             if (Math.random() > 0.9) {
                 const glitchText = document.querySelectorAll('.glitch-effect');
                 glitchText.forEach(el => {
                     el.style.transform = `translate(${Math.random() * 4 - 2}px, ${Math.random() * 4 - 2}px)`;
                 });
                 
-                // Случайные звуковые глюки
                 if (audioEnabled) {
-                    glitchSound.currentTime = 0;
-                    glitchSound.play().catch(e => console.error("Glitch sound error:", e));
-                    bgSound.playbackRate = Math.random() * 2 + 0.5;
+                    audioElements.glitch.currentTime = 0;
+                    audioElements.glitch.play().catch(e => console.error("Glitch sound error:", e));
+                    audioElements.bg.playbackRate = Math.random() * 2 + 0.5;
                 }
             }
             
             setTimeout(simulateGlitch, 1000);
         }
         
-        // ========== Имитация сбоя системы ==========
         function fakeCrash() {
             if (audioEnabled) {
-                errorSound.currentTime = 0;
-                errorSound.play().catch(e => console.error("Error sound error:", e));
+                audioElements.error.currentTime = 0;
+                audioElements.error.play().catch(e => console.error("Error sound error:", e));
             }
             
-            // Скрываем основной интерфейс и показываем экран сбоя
             document.getElementById('main-interface').style.display = 'none';
             const crashScreen = document.getElementById('crash-screen');
             crashScreen.style.display = 'block';
             document.getElementById('crash-progress').innerHTML = '';
             
-            // Добавляем эффект перезагрузки
             setTimeout(() => {
                 document.getElementById('crash-progress').innerHTML = "> ATTEMPTING SYSTEM RECOVERY...";
             }, 1500);
@@ -306,24 +175,28 @@
             }, 3000);
             
             setTimeout(() => {
-                // Восстанавливаем интерфейс
                 crashScreen.style.display = 'none';
                 document.getElementById('main-interface').style.display = 'block';
             }, 5000);
         }
         
-        // ========== Логирование нарушений ==========
         function logViolation(message) {
             const timestamp = new Date().toLocaleString();
             violationsLog.push({ timestamp, message });
-            
-            // Обновляем лог если открыта соответствующая секция
-            if (document.getElementById('violations-log')) {
-                showSection('violations');
+            updateViolationsLog();
+        }
+        
+        function updateViolationsLog() {
+            const logContainer = document.getElementById('violations-log');
+            if (logContainer) {
+                logContainer.innerHTML = violationsLog.map(v => `
+                    <div class="violation-entry">
+                        [${v.timestamp}] ${v.message}
+                    </div>
+                `).join('');
             }
         }
         
-        // ========== Магазин ==========
         function purchaseItem(itemId) {
             const item = shopItems.find(i => i.id === itemId);
             if (!item) return;
@@ -334,15 +207,12 @@
                 updateCreditsDisplay();
                 
                 if (audioEnabled) {
-                    purchaseSound.currentTime = 0;
-                    purchaseSound.play().catch(e => console.error("Purchase sound error:", e));
+                    audioElements.purchase.currentTime = 0;
+                    audioElements.purchase.play().catch(e => console.error("Purchase sound error:", e));
                 }
                 
-                // Обновляем отображение магазина
+                logViolation(`PURCHASED: ${item.name} for ${item.price} credits`);
                 showSection('shop');
-                
-                // Логируем покупку
-                logViolation(`PURCHASE: ${item.name} for ${item.price} credits`);
             } else {
                 alert("> INSUFFICIENT CREDITS");
             }
@@ -350,12 +220,9 @@
         
         function updateCreditsDisplay() {
             const creditsElement = document.getElementById('credits');
-            if (creditsElement) {
-                creditsElement.textContent = credits;
-            }
+            if (creditsElement) creditsElement.textContent = credits;
         }
         
-        // ========== Отображение разделов ==========
         function showSection(section) {
             const contentArea = document.getElementById('content-area');
             if (!contentArea) return;
@@ -383,31 +250,27 @@
                                 <small>> ${item.description}</small>
                             </div>
                         `).join('')}
-                        <br>
-                        > YOUR INVENTORY:<br>
-                        ${inventory.length > 0 ? 
-                            inventory.map(item => `- ${item.name}<br>`).join('') : 
-                            "> EMPTY"}
+                        <div id="inventory-list">
+                            > YOUR INVENTORY:<br>
+                            ${inventory.length > 0 ? 
+                                inventory.map(item => `- ${item.name}<br>`).join('') : 
+                                "> EMPTY"}
+                        </div>
                     `;
                     break;
                     
                 case 'violations':
                     content = `
-                        > VIOLATIONS LOG:<br>
+                        > VIOLATIONS LOG (TOTAL: ${violationsLog.length}):<br>
                         <div id="violations-log">
                             ${violationsLog.length > 0 ? 
-                                violationsLog.map(v => `
+                                violationsLog.slice().reverse().map(v => `
                                     <div class="violation-entry">
                                         [${v.timestamp}] ${v.message}
                                     </div>
                                 `).join('') : 
                                 "> NO VIOLATIONS RECORDED"}
                         </div>
-                        <br>
-                        > RECENT VIOLATIONS:<br>
-                        - ${new Date(new Date().setDate(new Date().getDate()-2)).toLocaleDateString()}: ATTEMPTED BRACELET TAMPERING (-50 CR)<br>
-                        - ${new Date(new Date().setDate(new Date().getDate()-5)).toLocaleDateString()}: REFUSED CLEANING DUTY (-30 CR)<br>
-                        <span class="error">NEXT VIOLATION: ELECTROSHOCK</span>
                     `;
                     break;
                     
@@ -416,26 +279,25 @@
                         > RULES:<br>
                         1. ESCAPE = TERMINATION<br>
                         2. DISOBEDIENCE = CREDIT DEDUCTION<br>
-                        3. EXPEDITION FAILURE = DEMOTION TO CLEANING CREW<br>
-                        4. UNAUTHORIZED COMMUNICATION = -15 CREDITS<br>
+                        3. UNAUTHORIZED COMMS = -15 CREDITS<br>
                         <span class="glitch-effect">BLACKTHORN IS WATCHING</span>
                     `;
                     break;
                     
                 case 'chat':
                     content = `
-                        > INMATE CHAT (LAST 4 MESSAGES):<br>
+                        > INMATE CHAT (LAST ${inmateChat.length} MESSAGES):<br>
                         <div id="chat-messages">
-                            ${inmateChat.map(msg => 
-                                `<div class="chat-message">
+                            ${inmateChat.slice().reverse().map(msg => `
+                                <div class="chat-message">
                                     <strong>${msg.sender}:</strong> ${msg.message}
-                                </div>`
-                            ).join('')}
+                                </div>
+                            `).join('')}
                         </div>
                         <br>
                         > NEW MESSAGE:<br>
                         <input type="text" id="chat-input" placeholder="Message (risky to send)">
-                        <button id="send-message-btn" style="background: black; color: #0f0; border: 1px solid #0f0;">SEND</button>
+                        <button id="send-message-btn">SEND</button>
                         <span class="error" id="chat-warning"></span>
                     `;
                     break;
@@ -443,111 +305,76 @@
             
             contentArea.innerHTML = content;
             
-            // Если это чат, инициализируем кнопку отправки
             if (section === 'chat') {
                 document.getElementById('send-message-btn').addEventListener('click', sendMessage);
             }
         }
         
-        // ========== Функции чата ==========
         function sendMessage() {
             const input = document.getElementById('chat-input');
             const warning = document.getElementById('chat-warning');
             
-            if (!input || !warning) return;
-            if (input.value.trim() === '') return;
+            if (!input || !warning || input.value.trim() === '') return;
             
-            // 30% chance of being detected
-            if (Math.random() < 0.3) {
+            const messageText = input.value.trim();
+            input.value = '';
+            
+            if (Math.random() < 0.3) { // 30% chance of detection
                 if (audioEnabled) {
-                    adminAlertSound.currentTime = 0;
-                    adminAlertSound.play().catch(e => console.error("Admin alert error:", e));
+                    audioElements.admin.currentTime = 0;
+                    audioElements.admin.play().catch(e => console.error("Admin alert error:", e));
                 }
                 
-                const violationMsg = `UNAUTHORIZED CHAT: "${input.value.trim().substring(0, 20)}${input.value.trim().length > 20 ? '...' : ''}"`;
-                warning.textContent = "! ADMIN ALERT: UNAUTHORIZED COMMUNICATION !";
-                
-                // Добавляем сообщение администратора
-                inmateChat.push({
-                    sender: "ADMIN", 
-                    message: "CELL-" + document.getElementById('cell-num').textContent + " VIOLATION RECORDED"
-                });
-                
-                // Deduct credits for violation
                 credits = Math.max(0, credits - 15);
                 updateCreditsDisplay();
                 
-                // Логируем нарушение
+                const violationMsg = `UNAUTHORIZED CHAT: "${messageText.substring(0, 20)}${messageText.length > 20 ? '...' : ''}"`;
                 logViolation(violationMsg);
                 
-                // Simulate admin message delay
+                warning.textContent = "! ADMIN ALERT: UNAUTHORIZED COMMUNICATION !";
+                inmateChat.push({ sender: "ADMIN", message: "VIOLATION RECORDED (-15 CR)" });
+                
                 setTimeout(() => {
-                    const chatMessages = document.getElementById('chat-messages');
-                    if (chatMessages) {
-                        chatMessages.innerHTML += `
-                            <div class="chat-message error">
-                                <strong>ADMIN:</strong> WARNING: NEXT VIOLATION WILL TRIGGER BRACELET SHOCK
-                            </div>
-                        `;
-                    }
-                }, 2000);
+                    warning.textContent = "";
+                    showSection('chat');
+                }, 3000);
             } else {
-                // Add normal message
                 inmateChat.push({
                     sender: "CELL-" + document.getElementById('cell-num').textContent,
-                    message: input.value
+                    message: messageText
                 });
             }
             
-            // Update chat
             showSection('chat');
-            input.value = '';
             
-            // Random cell number change (security measure)
             if (Math.random() > 0.7) {
-                const cellNum = document.getElementById('cell-num');
-                if (cellNum) {
-                    cellNum.textContent = Math.floor(Math.random() * 20) + 1;
-                }
+                document.getElementById('cell-num').textContent = Math.floor(Math.random() * 20) + 1;
             }
         }
         
-        // ========== Инициализация терминала ==========
+        // ===== Инициализация =====
         function initTerminal() {
-            // Random last login time
-            const lastLogin = new Date();
-            lastLogin.setDate(lastLogin.getDate() - Math.floor(Math.random() * 5));
-            const lastLoginElement = document.getElementById('last-login');
-            if (lastLoginElement) {
-                lastLoginElement.textContent = lastLogin.toLocaleString() + " (SYNC ERROR)";
-            }
+            document.getElementById('last-login').textContent = 
+                new Date(new Date().setDate(new Date().getDate() - Math.floor(Math.random() * 5))).toLocaleString() + 
+                " (SYNC ERROR)";
             
-            // Random cell number
-            const cellNum = document.getElementById('cell-num');
-            if (cellNum) {
-                cellNum.textContent = Math.floor(Math.random() * 20) + 1;
-            }
+            document.getElementById('cell-num').textContent = Math.floor(Math.random() * 20) + 1;
             
-            // Назначаем обработчики событий
-            document.querySelectorAll('.menu-item').forEach(item => {
-                const section = item.getAttribute('data-section');
-                if (section) {
-                    item.addEventListener('click', () => showSection(section));
-                }
+            document.querySelectorAll('.menu-item[data-section]').forEach(item => {
+                item.addEventListener('click', () => showSection(item.getAttribute('data-section')));
             });
             
             document.getElementById('medical-request').addEventListener('click', fakeCrash);
             document.getElementById('audio-toggle').addEventListener('click', toggleAudio);
+            
+            // Тестовые данные
+            logViolation("INITIAL SYSTEM CHECK");
+            logViolation("BRACELET SYNCHRONIZED");
         }
         
-        // ========== Запуск системы ==========
         document.addEventListener('DOMContentLoaded', () => {
             initTerminal();
             simulateGlitch();
-            
-            // Добавляем тестовые нарушения в лог
-            logViolation("ATTEMPTED BRACELET TAMPERING (-50 CR)");
-            logViolation("REFUSED CLEANING DUTY (-30 CR)");
         });
     </script>
 </body>
