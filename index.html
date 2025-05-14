@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BLOCKGAUZ INTRANET v3.1.4</title>
+    <title>BLOCKGAUZ INTRANET v3.2.0</title>
     <style>
-        /* Все ваши существующие стили остаются без изменений */
         body {
             background-color: #000;
             color: #0f0;
@@ -116,6 +115,32 @@
             display: none;
             color: #f00;
         }
+        
+        .shop-item {
+            margin: 5px 0;
+            padding: 5px;
+            border: 1px dashed #0f0;
+            cursor: pointer;
+        }
+        
+        .shop-item:hover {
+            background-color: rgba(0, 255, 0, 0.1);
+        }
+        
+        #violations-log {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #f00;
+            padding: 5px;
+            margin-top: 10px;
+        }
+        
+        .violation-entry {
+            color: #f00;
+            margin: 3px 0;
+            padding: 2px;
+            border-bottom: 1px solid #f00;
+        }
     </style>
 </head>
 <body>
@@ -132,6 +157,9 @@
     <audio id="admin-alert">
         <source src="sounds/admin-alert.mp3" type="audio/mpeg">
     </audio>
+    <audio id="purchase-sound">
+        <source src="sounds/purchase.mp3" type="audio/mpeg">
+    </audio>
     
     <div class="terminal">
         <div class="scanlines"></div>
@@ -145,7 +173,7 @@
             </div>
             
             <div id="main-menu">
-                <h2 class="glitch-effect">> BLACKTHORN INTRANET v3.1.4</h2>
+                <h2 class="glitch-effect">> BLACKTHORN INTRANET v3.2.0</h2>
                 <p>Last login: <span id="last-login">ERROR: DATE CORRUPTED</span></p>
                 
                 <div class="menu-item" data-section="schedule">[1] SCHEDULE</div>
@@ -178,6 +206,7 @@
         const glitchSound = document.getElementById('glitch-sound');
         const errorSound = document.getElementById('error-sound');
         const adminAlertSound = document.getElementById('admin-alert');
+        const purchaseSound = document.getElementById('purchase-sound');
         let audioEnabled = false;
         
         // Установка громкости
@@ -185,6 +214,7 @@
         glitchSound.volume = 0.5;
         errorSound.volume = 0.7;
         adminAlertSound.volume = 0.6;
+        purchaseSound.volume = 0.8;
         
         // ========== Глобальные переменные ==========
         let credits = 120;
@@ -194,6 +224,21 @@
             {sender: "CELL-3", message: "Меняю патроны на антибиотики"},
             {sender: "ADMIN", message: "WARNING: UNAUTHORIZED COMMUNICATION DETECTED"}
         ];
+        
+        // Лог нарушений
+        const violationsLog = [];
+        
+        // Товары в магазине
+        const shopItems = [
+            { id: 1, name: "GAS MASK FILTER", price: 20, description: "Protects against spores (3 uses)" },
+            { id: 2, name: "PAIN RELIEF", price: 15, description: "Reduces infection symptoms" },
+            { id: 3, name: "EXTRA RATIONS", price: 10, description: "1 week of food supply" },
+            { id: 4, name: "BRACELET OVERRIDE", price: 50, description: "Disables shock for 24h" },
+            { id: 5, name: "MAP SECTOR D-9", price: 30, description: "Detailed expedition map" }
+        ];
+        
+        // Инвентарь
+        let inventory = [];
         
         // ========== Управление звуком ==========
         function toggleAudio() {
@@ -267,6 +312,49 @@
             }, 5000);
         }
         
+        // ========== Логирование нарушений ==========
+        function logViolation(message) {
+            const timestamp = new Date().toLocaleString();
+            violationsLog.push({ timestamp, message });
+            
+            // Обновляем лог если открыта соответствующая секция
+            if (document.getElementById('violations-log')) {
+                showSection('violations');
+            }
+        }
+        
+        // ========== Магазин ==========
+        function purchaseItem(itemId) {
+            const item = shopItems.find(i => i.id === itemId);
+            if (!item) return;
+            
+            if (credits >= item.price) {
+                credits -= item.price;
+                inventory.push(item);
+                updateCreditsDisplay();
+                
+                if (audioEnabled) {
+                    purchaseSound.currentTime = 0;
+                    purchaseSound.play().catch(e => console.error("Purchase sound error:", e));
+                }
+                
+                // Обновляем отображение магазина
+                showSection('shop');
+                
+                // Логируем покупку
+                logViolation(`PURCHASE: ${item.name} for ${item.price} credits`);
+            } else {
+                alert("> INSUFFICIENT CREDITS");
+            }
+        }
+        
+        function updateCreditsDisplay() {
+            const creditsElement = document.getElementById('credits');
+            if (creditsElement) {
+                creditsElement.textContent = credits;
+            }
+        }
+        
         // ========== Отображение разделов ==========
         function showSection(section) {
             const contentArea = document.getElementById('content-area');
@@ -288,17 +376,35 @@
                     
                 case 'shop':
                     content = `
-                        > CREDIT SHOP:<br>
-                        [1] GAS MASK FILTER - 20 CREDITS<br>
-                        [2] PAIN RELIEF - 15 CREDITS<br>
-                        [3] EXTRA RATIONS - 10 CREDITS<br>
-                        <span class="${credits < 10 ? 'error' : ''}">YOUR CREDITS: ${credits}</span>
+                        > CREDIT SHOP (YOUR CREDITS: <span class="${credits < 10 ? 'error' : ''}">${credits}</span>)<br>
+                        ${shopItems.map(item => `
+                            <div class="shop-item" onclick="purchaseItem(${item.id})">
+                                [${item.id}] ${item.name} - ${item.price} CR<br>
+                                <small>> ${item.description}</small>
+                            </div>
+                        `).join('')}
+                        <br>
+                        > YOUR INVENTORY:<br>
+                        ${inventory.length > 0 ? 
+                            inventory.map(item => `- ${item.name}<br>`).join('') : 
+                            "> EMPTY"}
                     `;
                     break;
                     
                 case 'violations':
                     content = `
-                        > VIOLATIONS:<br>
+                        > VIOLATIONS LOG:<br>
+                        <div id="violations-log">
+                            ${violationsLog.length > 0 ? 
+                                violationsLog.map(v => `
+                                    <div class="violation-entry">
+                                        [${v.timestamp}] ${v.message}
+                                    </div>
+                                `).join('') : 
+                                "> NO VIOLATIONS RECORDED"}
+                        </div>
+                        <br>
+                        > RECENT VIOLATIONS:<br>
                         - ${new Date(new Date().setDate(new Date().getDate()-2)).toLocaleDateString()}: ATTEMPTED BRACELET TAMPERING (-50 CR)<br>
                         - ${new Date(new Date().setDate(new Date().getDate()-5)).toLocaleDateString()}: REFUSED CLEANING DUTY (-30 CR)<br>
                         <span class="error">NEXT VIOLATION: ELECTROSHOCK</span>
@@ -311,6 +417,7 @@
                         1. ESCAPE = TERMINATION<br>
                         2. DISOBEDIENCE = CREDIT DEDUCTION<br>
                         3. EXPEDITION FAILURE = DEMOTION TO CLEANING CREW<br>
+                        4. UNAUTHORIZED COMMUNICATION = -15 CREDITS<br>
                         <span class="glitch-effect">BLACKTHORN IS WATCHING</span>
                     `;
                     break;
@@ -357,7 +464,10 @@
                     adminAlertSound.play().catch(e => console.error("Admin alert error:", e));
                 }
                 
+                const violationMsg = `UNAUTHORIZED CHAT: "${input.value.trim().substring(0, 20)}${input.value.trim().length > 20 ? '...' : ''}"`;
                 warning.textContent = "! ADMIN ALERT: UNAUTHORIZED COMMUNICATION !";
+                
+                // Добавляем сообщение администратора
                 inmateChat.push({
                     sender: "ADMIN", 
                     message: "CELL-" + document.getElementById('cell-num').textContent + " VIOLATION RECORDED"
@@ -365,8 +475,10 @@
                 
                 // Deduct credits for violation
                 credits = Math.max(0, credits - 15);
-                const creditsElement = document.getElementById('credits');
-                if (creditsElement) creditsElement.textContent = credits;
+                updateCreditsDisplay();
+                
+                // Логируем нарушение
+                logViolation(violationMsg);
                 
                 // Simulate admin message delay
                 setTimeout(() => {
@@ -432,6 +544,10 @@
         document.addEventListener('DOMContentLoaded', () => {
             initTerminal();
             simulateGlitch();
+            
+            // Добавляем тестовые нарушения в лог
+            logViolation("ATTEMPTED BRACELET TAMPERING (-50 CR)");
+            logViolation("REFUSED CLEANING DUTY (-30 CR)");
         });
     </script>
 </body>
