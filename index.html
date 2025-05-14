@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BLOCKGAUZ INTRANET v3.2.1</title>
     <style>
-        /* Все стили остаются без изменений */
         body { background-color: #000; color: #0f0; font-family: 'Courier New', monospace; margin: 0; padding: 0; overflow-x: hidden; cursor: default; }
         .glitch-effect { text-shadow: 0 0 5px #0f0; animation: glitch 1s infinite; }
         @keyframes glitch {
@@ -30,9 +29,12 @@
         #crash-screen { display: none; color: #f00; }
         .shop-item { margin: 5px 0; padding: 5px; border: 1px dashed #0f0; cursor: pointer; }
         .shop-item:hover { background-color: rgba(0, 255, 0, 0.1); }
+        .shop-item.illegal { border-color: #f00; color: #f55; }
+        .shop-item.illegal:hover { background-color: rgba(255, 0, 0, 0.1); }
         #violations-log { max-height: 200px; overflow-y: auto; border: 1px solid #f00; padding: 5px; margin-top: 10px; }
         .violation-entry { color: #f00; margin: 3px 0; padding: 2px; border-bottom: 1px solid #f00; }
         #inventory-list { margin-top: 10px; border-top: 1px dashed #0f0; padding-top: 5px; }
+        .admin-alert { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: black; border: 2px solid #f00; padding: 20px; z-index: 1000; text-align: center; }
     </style>
 </head>
 <body>
@@ -112,8 +114,12 @@
             { id: 1, name: "GAS MASK FILTER", price: 20, description: "Protects against spores (3 uses)" },
             { id: 2, name: "PAIN RELIEF", price: 15, description: "Reduces infection symptoms" },
             { id: 3, name: "EXTRA RATIONS", price: 10, description: "1 week of food supply" },
-            { id: 4, name: "BRACELET OVERRIDE", price: 50, description: "Disables shock for 24h" },
-            { id: 5, name: "MAP SECTOR D-9", price: 30, description: "Detailed expedition map" }
+            { id: 4, name: "SILENCE CODE", price: 50, description: "Jams bracelet signal for 2h (risk: HUNT PROTOCOL)", illegal: true },
+            { id: 5, name: "MAP SECTOR D-9", price: 30, description: "Detailed expedition map" },
+            { id: 6, name: "FAKE ID CHIP", price: 40, description: "Changes your inmate ID for 1h (15% alert chance)", illegal: true },
+            { id: 7, name: "SHIV", price: 25, description: "Improvised knife (20% alert chance)", illegal: true },
+            { id: 8, name: "BRACELET SCANNER", price: 60, description: "Locate other inmates (10% alert chance)", illegal: true },
+            { id: 9, name: "SWEET DREAMS", price: 30, description: "Drugs to skip work shift (25% alert chance)", illegal: true }
         ];
 
         // ===== Основные функции =====
@@ -197,6 +203,40 @@
             }
         }
         
+        function getAlertChance(item) {
+            const chanceMap = {
+                "FAKE ID CHIP": 0.15,
+                "SHIV": 0.20,
+                "BRACELET SCANNER": 0.10,
+                "SWEET DREAMS": 0.25,
+                "SILENCE CODE": 0.30
+            };
+            return chanceMap[item.name] || 0;
+        }
+        
+        function triggerAdminAlert(message) {
+            if (audioEnabled) {
+                audioElements.admin.currentTime = 0;
+                audioElements.admin.play().catch(e => console.error("Admin alert error:", e));
+            }
+            
+            credits = Math.max(0, credits - 20);
+            updateCreditsDisplay();
+            
+            logViolation(message);
+            inmateChat.push({ 
+                sender: "ADMIN", 
+                message: "SECURITY ALERT: Contraband detected (-20 credits)" 
+            });
+            
+            const warning = document.createElement('div');
+            warning.className = 'error blink';
+            warning.textContent = "! ADMIN NOTICE: CONTRABAND SCAN IN PROGRESS !";
+            document.getElementById('content-area').appendChild(warning);
+            
+            setTimeout(() => warning.remove(), 3000);
+        }
+        
         function purchaseItem(itemId) {
             const item = shopItems.find(i => i.id === itemId);
             if (!item) return;
@@ -206,6 +246,10 @@
                 inventory.push(item);
                 updateCreditsDisplay();
                 
+                if (item.illegal && Math.random() < getAlertChance(item)) {
+                    triggerAdminAlert(`ILLEGAL PURCHASE: ${item.name}`);
+                }
+
                 if (audioEnabled) {
                     audioElements.purchase.currentTime = 0;
                     audioElements.purchase.play().catch(e => console.error("Purchase sound error:", e));
@@ -244,12 +288,22 @@
                 case 'shop':
                     content = `
                         > CREDIT SHOP (YOUR CREDITS: <span class="${credits < 10 ? 'error' : ''}">${credits}</span>)<br>
-                        ${shopItems.map(item => `
+                        <h3>LEGAL ITEMS:</h3>
+                        ${shopItems.filter(item => !item.illegal).map(item => `
                             <div class="shop-item" onclick="purchaseItem(${item.id})">
                                 [${item.id}] ${item.name} - ${item.price} CR<br>
                                 <small>> ${item.description}</small>
                             </div>
                         `).join('')}
+                        
+                        <h3 class="glitch-effect">BLACK MARKET (RISK OF DETECTION):</h3>
+                        ${shopItems.filter(item => item.illegal).map(item => `
+                            <div class="shop-item illegal" onclick="purchaseItem(${item.id})">
+                                [${item.id}] ${item.name} - ${item.price} CR<br>
+                                <small>> ${item.description}</small>
+                            </div>
+                        `).join('')}
+                        
                         <div id="inventory-list">
                             > YOUR INVENTORY:<br>
                             ${inventory.length > 0 ? 
