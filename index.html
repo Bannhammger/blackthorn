@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BLOCKGAUZ INTRANET v3.1.4</title>
     <style>
+        /* Ваши существующие стили остаются без изменений */
         body {
             background-color: #000;
             color: #0f0;
@@ -110,6 +111,11 @@
         .blink {
             animation: blink 0.5s infinite;
         }
+        
+        #crash-screen {
+            display: none;
+            color: #f00;
+        }
     </style>
 </head>
 <body>
@@ -130,27 +136,40 @@
     <div class="terminal">
         <div class="scanlines"></div>
         
-        <div class="status-bar glitch-effect">
-            > INMATE_ID: <span id="inmate-id">CELL-<span id="cell-num">12</span></span> | 
-            CREDITS: <span id="credits">120</span> | 
-            STATUS: <span class="error">RESTRICTED</span>
-        </div>
-        
-        <div id="main-menu">
-            <h2 class="glitch-effect">> BLACKTHORN INTRANET v3.1.4</h2>
-            <p>Last login: <span id="last-login">ERROR: DATE CORRUPTED</span></p>
+        <!-- Основной интерфейс -->
+        <div id="main-interface">
+            <div class="status-bar glitch-effect">
+                > INMATE_ID: <span id="inmate-id">CELL-<span id="cell-num">12</span></span> | 
+                CREDITS: <span id="credits">120</span> | 
+                STATUS: <span class="error">RESTRICTED</span>
+            </div>
             
-            <div class="menu-item" onclick="showSection('schedule')">[1] SCHEDULE</div>
-            <div class="menu-item" onclick="showSection('shop')">[2] CREDIT SHOP</div>
-            <div class="menu-item" onclick="showSection('violations')">[3] VIOLATIONS</div>
-            <div class="menu-item" onclick="showSection('rules')">[4] RULES</div>
-            <div class="menu-item" onclick="showSection('chat')">[5] INMATE CHAT (UNOFFICIAL)</div>
-            <div class="menu-item error" onclick="fakeCrash()">[6] REQUEST MEDICAL (UNAVAILABLE)</div>
+            <div id="main-menu">
+                <h2 class="glitch-effect">> BLACKTHORN INTRANET v3.1.4</h2>
+                <p>Last login: <span id="last-login">ERROR: DATE CORRUPTED</span></p>
+                
+                <div class="menu-item" onclick="showSection('schedule')">[1] SCHEDULE</div>
+                <div class="menu-item" onclick="showSection('shop')">[2] CREDIT SHOP</div>
+                <div class="menu-item" onclick="showSection('violations')">[3] VIOLATIONS</div>
+                <div class="menu-item" onclick="showSection('rules')">[4] RULES</div>
+                <div class="menu-item" onclick="showSection('chat')">[5] INMATE CHAT (UNOFFICIAL)</div>
+                <div class="menu-item error" onclick="fakeCrash()">[6] REQUEST MEDICAL (UNAVAILABLE)</div>
+            </div>
+            
+            <div id="content-area" style="margin-top: 20px;"></div>
+            
+            <button id="audio-toggle" onclick="toggleAudio()">ENABLE AUDIO</button>
         </div>
         
-        <div id="content-area" style="margin-top: 20px;"></div>
-        
-        <button id="audio-toggle" onclick="toggleAudio()">ENABLE AUDIO</button>
+        <!-- Экран сбоя (изначально скрыт) -->
+        <div id="crash-screen">
+            > SYSTEM ERROR 0x1F3A7<br>
+            > MEDICAL REQUEST DENIED<br>
+            > REASON: INSUFFICIENT CREDITS<br>
+            > CONTACT ADMINISTRATOR<br><br>
+            <span class="blink">_</span>
+            <div id="crash-progress"></div>
+        </div>
     </div>
 
     <script>
@@ -226,35 +245,37 @@
                 errorSound.play().catch(e => console.error("Error sound error:", e));
             }
             
-            const terminal = document.querySelector('.terminal');
-            const oldContent = terminal.innerHTML;
-            
-            terminal.innerHTML = `
-                <div style="color: #f00;">
-                    > SYSTEM ERROR 0x1F3A7<br>
-                    > MEDICAL REQUEST DENIED<br>
-                    > REASON: INSUFFICIENT CREDITS<br>
-                    > CONTACT ADMINISTRATOR<br><br>
-                    <span class="blink">_</span>
-                </div>
+            // Скрываем основной интерфейс и показываем экран сбоя
+            document.getElementById('main-interface').style.display = 'none';
+            const crashScreen = document.getElementById('crash-screen');
+            crashScreen.style.display = 'block';
+            crashScreen.innerHTML = `
+                > SYSTEM ERROR 0x1F3A7<br>
+                > MEDICAL REQUEST DENIED<br>
+                > REASON: INSUFFICIENT CREDITS<br>
+                > CONTACT ADMINISTRATOR<br><br>
+                <span class="blink">_</span>
+                <div id="crash-progress"></div>
             `;
             
             // Добавляем эффект перезагрузки
             setTimeout(() => {
-                terminal.innerHTML += "> ATTEMPTING SYSTEM RECOVERY...";
+                document.getElementById('crash-progress').innerHTML = "> ATTEMPTING SYSTEM RECOVERY...";
             }, 1500);
             
             setTimeout(() => {
-                terminal.innerHTML += "<br>> LOADING BACKUP...";
+                document.getElementById('crash-progress').innerHTML += "<br>> LOADING BACKUP...";
             }, 3000);
             
             setTimeout(() => {
-                terminal.innerHTML = oldContent;
-                initTerminal();
+                // Восстанавливаем интерфейс
+                crashScreen.style.display = 'none';
+                document.getElementById('main-interface').style.display = 'block';
+                initTerminal(); // Переинициализируем обработчики событий
             }, 5000);
         }
         
-        // ========== Отображение разделов ==========
+        // ========== Остальные функции остаются без изменений ==========
         function showSection(section) {
             const contentArea = document.getElementById('content-area');
             if (!contentArea) return;
@@ -324,7 +345,6 @@
             contentArea.innerHTML = content;
         }
         
-        // ========== Функции чата ==========
         function sendMessage() {
             const input = document.getElementById('chat-input');
             const warning = document.getElementById('chat-warning');
